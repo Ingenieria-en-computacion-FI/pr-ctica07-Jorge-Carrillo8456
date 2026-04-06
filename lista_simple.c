@@ -1,5 +1,6 @@
-#include <stddef.h>
-#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "lista_simple.h"
 
 Nodo* crearNodo(void *dato, size_t size){
@@ -198,18 +199,70 @@ void eliminarElementosIguales(Lista* lista, void* dato, CompararFunc cmp){
 }
 
 // Búsquedas
-void* buscarPorPosicion(Lista* lista, int pos);
-int buscarPorElemento(Lista* lista, void* dato, CompararFunc cmp);
+void* buscarPorPosicion(Lista* lista, int pos) {
+    if (esVacia(lista) || pos < 1) return NULL;
+    Nodo *tmp = lista->head;
+    for (int i = 1; i < pos && tmp != NULL; i++) {
+        tmp = tmp->siguiente;
+    }
+    return (tmp != NULL) ? tmp->dato : NULL;
+}
+
+int buscarPorElemento(Lista* lista, void* dato, CompararFunc cmp) {
+    if (esVacia(lista)) return -1;
+    Nodo *tmp = lista->head;
+    int pos = 1;
+    while (tmp != NULL) {
+        if (cmp(tmp->dato, dato) == 0) return pos;
+        tmp = tmp->siguiente;
+        pos++;
+    }
+    return -1;
+}
 
 // Navegación
-Nodo* primero(Lista* lista);
-Nodo* ultimo(Lista* lista);
-Nodo* siguiente(Nodo* actual);
+Nodo* primero(Lista* lista) {
+    if (lista != NULL) {
+        return lista->head;
+    }
+    return NULL;
+}
 
-// Modificar
-void modificar(Lista* lista, int pos, void* dato, size_t size);
+Nodo* ultimo(Lista* lista) {
+    if (lista != NULL) {
+        return lista->tail;
+    }
+    return NULL;
+}
 
-// Utilidad
-void imprimirLista(Lista* lista, ImprimirFunc imprimir);
-void vaciarLista(Lista* lista);
-void borrarLista(Lista* lista);
+Nodo* siguiente(Nodo* actual) {
+    if (actual != NULL) {
+        return actual->siguiente;
+    }
+    return NULL;
+}
+
+void imprimirLista(Lista* lista, ImprimirFunc imprimir) {
+    if (esVacia(lista)) {
+        printf("Lista vacia.\n");
+        return;
+    }
+    for (Nodo *tmp = lista->head; tmp != NULL; tmp = tmp->siguiente) {
+        imprimir(tmp->dato);
+        printf(" -> ");
+    }
+    printf("NULL\n");
+}
+
+void vaciarLista(Lista* lista) {
+    while (!esVacia(lista)) {
+        eliminarInicio(lista);
+    }
+}
+
+void borrarLista(Lista* lista) {
+    if (lista != NULL) {
+        vaciarLista(lista);
+        free(lista);
+    }
+}
